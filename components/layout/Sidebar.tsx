@@ -4,46 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   HomeIcon,
-  CalendarIcon,
-  DumbbellIcon,
-  BookmarkIcon,
-  SparklesIcon,
   BookIcon,
-  GlobeIcon,
-  SmileIcon,
-  BulbIcon,
   CloseIcon,
 } from "@/components/icons";
 
 const menuGroups = [
   {
-    group: "效率",
+    group: "阅读",
     items: [
-      { href: "/", label: "工作台", icon: HomeIcon },
-      { href: "/plan", label: "每日计划", icon: CalendarIcon },
-    ],
-  },
-  {
-    group: "健康",
-    items: [{ href: "/sports", label: "运动打卡", icon: DumbbellIcon }],
-  },
-  {
-    group: "收藏",
-    items: [{ href: "/favorites", label: "我的收藏夹", icon: BookmarkIcon }],
-  },
-  {
-    group: "学习",
-    items: [
-      { href: "/ai-tips", label: "AI技巧库", icon: SparklesIcon },
-      { href: "/reading", label: "读书计划", icon: BookIcon },
-      { href: "/language", label: "语言学习", icon: GlobeIcon },
-    ],
-  },
-  {
-    group: "生活",
-    items: [
-      { href: "/mood", label: "心情日记", icon: SmileIcon },
-      { href: "/inspiration", label: "灵感泡泡", icon: BulbIcon },
+      { href: "/", label: "首页", icon: HomeIcon },
+      { href: "/reading", label: "书架", icon: BookIcon },
     ],
   },
 ];
@@ -72,16 +42,16 @@ export function Sidebar({
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* 用户信息区 */}
+        {/* 品牌区 */}
         <div className="p-5 bg-gradient-to-br from-sage-500 to-sage-600 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center text-xl font-bold">
-                我
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20">
+                <BookIcon size={24} />
               </div>
               <div>
-                <p className="font-semibold text-lg">成长者</p>
-                <p className="text-sm text-white/80">每天进步一点点</p>
+                <p className="text-xl font-semibold tracking-wide">阅迹</p>
+                <p className="text-sm text-white/80">推进 · 留痕 · 积累</p>
               </div>
             </div>
             <button
@@ -91,21 +61,9 @@ export function Sidebar({
               <CloseIcon size={22} />
             </button>
           </div>
-          {/* 统计 */}
-          <div className="flex gap-4 mt-4 text-sm">
-            <div>
-              <p className="font-bold text-xl">28</p>
-              <p className="text-white/70 text-xs">连续打卡</p>
-            </div>
-            <div>
-              <p className="font-bold text-xl">156</p>
-              <p className="text-white/70 text-xs">完成任务</p>
-            </div>
-            <div>
-              <p className="font-bold text-xl">42h</p>
-              <p className="text-white/70 text-xs">本月运动</p>
-            </div>
-          </div>
+          <p className="mt-4 max-w-48 text-sm leading-6 text-white/75">
+            让阅读适应生活，也让每一次阅读留下痕迹。
+          </p>
         </div>
 
         {/* 菜单 */}

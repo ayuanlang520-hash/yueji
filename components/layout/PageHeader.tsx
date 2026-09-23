@@ -1,6 +1,6 @@
-// 页面头部 —— 菜单按钮 + 标题 + 通知
+// 页面头部 —— 菜单按钮 + 标题
 "use client";
-import { MenuIcon, BellIcon } from "@/components/icons";
+import { MenuIcon } from "@/components/icons";
 
 export function PageHeader({
   title,
@@ -18,16 +18,10 @@ export function PageHeader({
       >
         <MenuIcon size={22} />
       </button>
-      <h1 className="text-lg font-semibold text-sage-800 flex-1 md:text-center">
+      <h1 className="flex-1 text-center text-lg font-semibold tracking-wide text-sage-800">
         {title}
       </h1>
-      <button
-        className="p-2 -mr-2 text-sage-700 active:bg-sage-100 rounded-lg relative"
-        aria-label="通知"
-      >
-        <BellIcon size={22} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-rose rounded-full" />
-      </button>
+      <div className="w-10 md:hidden" aria-hidden="true" />
     </header>
   );
 }

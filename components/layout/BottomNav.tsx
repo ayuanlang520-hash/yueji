@@ -2,20 +2,18 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, CalendarIcon, BookmarkIcon, TreeIcon } from "@/components/icons";
+import { HomeIcon, BookIcon } from "@/components/icons";
 
 const items = [
-  { href: "/", label: "工作台", icon: HomeIcon },
-  { href: "/plan", label: "计划", icon: CalendarIcon },
-  { href: "/favorites", label: "收藏", icon: BookmarkIcon },
-  { href: "/growth", label: "成长", icon: TreeIcon },
+  { href: "/", label: "首页", icon: HomeIcon },
+  { href: "/reading", label: "书架", icon: BookIcon },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-sage-100 safe-bottom md:hidden">
-      <div className="flex items-center justify-around h-16">
+      <div className="mx-auto flex h-16 max-w-sm items-center justify-around">
         {items.map(({ href, label, icon: Icon }) => {
           const active =
             pathname === href || (href !== "/" && pathname.startsWith(href));

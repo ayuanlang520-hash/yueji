@@ -4,8 +4,8 @@ import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 
 export const metadata: Metadata = {
-  title: "AI个人成长工作台",
-  description: "计划、学习、运动、心情、灵感和成长记录的个人工作台",
+  title: "阅迹",
+  description: "推进阅读，留下想法，看见自己的阅读轨迹。",
 };
 
 export const viewport: Viewport = {
