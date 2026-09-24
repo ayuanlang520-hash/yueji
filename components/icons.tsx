@@ -193,6 +193,14 @@ export const SettingsIcon = ({ className, size }: IconProps) => (
   </svg>
 );
 
+// 用户/我的
+export const UserIcon = ({ className, size }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0" />
+  </svg>
+);
+
 // 火焰（连续打卡）
 export const FlameIcon = ({ className, size }: IconProps) => (
   <svg {...base(size)} className={className}>

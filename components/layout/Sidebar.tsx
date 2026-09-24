@@ -6,6 +6,7 @@ import {
   HomeIcon,
   BookIcon,
   CloseIcon,
+  UserIcon,
 } from "@/components/icons";
 
 const menuGroups = [
@@ -14,6 +15,7 @@ const menuGroups = [
     items: [
       { href: "/", label: "首页", icon: HomeIcon },
       { href: "/reading", label: "书架", icon: BookIcon },
+      { href: "/settings", label: "我的", icon: UserIcon },
     ],
   },
 ];

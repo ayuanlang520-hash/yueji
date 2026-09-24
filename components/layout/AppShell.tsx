@@ -10,6 +10,7 @@ import { PageHeader } from "./PageHeader";
 const titleMap: Record<string, string> = {
   "/": "阅迹",
   "/reading": "书架",
+  "/settings": "我的",
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {

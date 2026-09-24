@@ -2,11 +2,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, BookIcon } from "@/components/icons";
+import { HomeIcon, BookIcon, UserIcon } from "@/components/icons";
 
 const items = [
   { href: "/", label: "首页", icon: HomeIcon },
   { href: "/reading", label: "书架", icon: BookIcon },
+  { href: "/settings", label: "我的", icon: UserIcon },
 ];
 
 export function BottomNav() {
