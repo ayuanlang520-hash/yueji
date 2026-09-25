@@ -1,61 +1,42 @@
-import { BookCard } from "@/components/books/BookCard";
+import Link from "next/link";
+import { BookShelfManager } from "@/components/books/BookShelfManager";
 import { BookIcon } from "@/components/icons";
 import { Card } from "@/components/ui/Card";
-import { mockBooks } from "@/lib/mockData";
+import { getBookShelf } from "@/lib/books";
 
-export default function ReadingPage() {
-  const reading = mockBooks.filter((book) => book.status === "reading");
-  const finished = mockBooks.filter((book) => book.status === "done");
+export const dynamic = "force-dynamic";
+
+export default async function ReadingPage() {
+  const shelf = await getBookShelf();
+
+  if (!shelf.signedIn) {
+    return (
+      <Card className="border border-sage-100 p-6 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-sage-100 text-sage-600">
+          <BookIcon size={23} />
+        </div>
+        <h1 className="mt-4 text-xl font-semibold text-sage-800">登录后建立自己的书架</h1>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-sage-500">
+          书籍和阅读进度会只保存在你的账号中，换设备后也能继续。
+        </p>
+        <Link
+          href="/settings"
+          className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-xl bg-sage-600 px-5 text-sm font-medium text-white hover:bg-sage-700 focus:outline-none focus:ring-2 focus:ring-sage-300"
+        >
+          前往登录
+        </Link>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-7 animate-fade-in">
-      <section>
-        <div className="mb-3 px-1">
-          <p className="text-xs text-sage-400">正在阅读 · {reading.length} 本</p>
-          <h2 className="mt-0.5 text-lg font-semibold text-sage-800">
-            从上次的位置继续
-          </h2>
-        </div>
-        <div className="space-y-3">
-          {reading.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </div>
-      </section>
-
-      {finished.length > 0 && (
-        <section>
-          <div className="mb-3 px-1">
-            <p className="text-xs text-sage-400">已经读完</p>
-            <h2 className="mt-0.5 text-lg font-semibold text-sage-800">
-              留在书架上的收获
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {finished.map((book) => (
-              <Card key={book.id} className="flex items-center gap-3">
-                <div
-                  className="flex h-14 w-10 shrink-0 items-center justify-center rounded-lg text-white"
-                  style={{ backgroundColor: book.coverColor }}
-                >
-                  <BookIcon size={16} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-sage-800">
-                    {book.title}
-                  </p>
-                  <p className="mt-0.5 text-xs text-sage-400">
-                    {book.author} · {book.totalPages} 页
-                  </p>
-                </div>
-                <span className="rounded-full bg-sage-100 px-2 py-1 text-xs text-sage-600">
-                  已读完
-                </span>
-              </Card>
-            ))}
-          </div>
-        </section>
+    <div className="animate-fade-in">
+      {shelf.error && (
+        <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {shelf.error}
+        </p>
       )}
+      <BookShelfManager books={shelf.books} />
     </div>
   );
 }

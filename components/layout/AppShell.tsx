@@ -10,6 +10,7 @@ import { PageHeader } from "./PageHeader";
 const titleMap: Record<string, string> = {
   "/": "阅迹",
   "/reading": "书架",
+  "/traces": "轨迹",
   "/settings": "我的",
 };
 

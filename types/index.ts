@@ -55,9 +55,11 @@ export interface Book {
   author: string;
   totalPages: number;
   currentPage: number;
-  planDate: string; // 计划完成日期
+  planDate?: string; // 计划完成日期
   status: "reading" | "done";
   coverColor: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // ===== AI 技巧库 =====

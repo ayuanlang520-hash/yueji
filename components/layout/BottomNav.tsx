@@ -2,11 +2,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, BookIcon, UserIcon } from "@/components/icons";
+import { HomeIcon, BookIcon, TreeIcon, UserIcon } from "@/components/icons";
 
 const items = [
   { href: "/", label: "首页", icon: HomeIcon },
   { href: "/reading", label: "书架", icon: BookIcon },
+  { href: "/traces", label: "轨迹", icon: TreeIcon },
   { href: "/settings", label: "我的", icon: UserIcon },
 ];
 
