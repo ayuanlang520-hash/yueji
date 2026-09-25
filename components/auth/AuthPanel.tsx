@@ -31,7 +31,7 @@ export function AuthPanel({
       const { error } = await supabase.auth.signInWithOtp({
         email: inputEmail,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
         },
       });
 
