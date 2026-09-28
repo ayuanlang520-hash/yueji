@@ -5,6 +5,22 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 
+function getAuthErrorMessage(message: string, action: "send" | "verify") {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("rate limit")) {
+    return "发送次数较多，请稍后再试。";
+  }
+
+  if (normalized.includes("expired") || normalized.includes("invalid")) {
+    return "验证码无效或已经过期，请重新发送。";
+  }
+
+  return action === "send"
+    ? "验证码发送失败，请稍后再试。"
+    : "验证码验证失败，请稍后再试。";
+}
+
 export function AuthPanel({
   configured,
   email,
@@ -16,8 +32,10 @@ export function AuthPanel({
 }) {
   const router = useRouter();
   const [inputEmail, setInputEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<"email" | "code">("email");
   const [message, setMessage] = useState(
-    invalidLink ? "登录链接无效或已经过期，请重新发送。" : "",
+    invalidLink ? "旧登录链接已经失效，请改用邮箱验证码登录。" : "",
   );
   const [submitting, setSubmitting] = useState(false);
 
@@ -28,18 +46,48 @@ export function AuthPanel({
 
     try {
       const supabase = createClient();
+      const emailAddress = inputEmail.trim();
       const { error } = await supabase.auth.signInWithOtp({
-        email: inputEmail,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
-        },
+        email: emailAddress,
       });
 
-      setMessage(
-        error ? `发送失败：${error.message}` : "登录链接已发送，请检查邮箱。",
-      );
+      if (error) {
+        setMessage(getAuthErrorMessage(error.message, "send"));
+        return;
+      }
+
+      setInputEmail(emailAddress);
+      setStep("code");
+      setMessage("验证码已发送，请查看邮箱。");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "发送失败，请稍后重试。");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleVerify(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setMessage("");
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.verifyOtp({
+        email: inputEmail,
+        token: otp.trim(),
+        type: "email",
+      });
+
+      if (error) {
+        setMessage(getAuthErrorMessage(error.message, "verify"));
+        return;
+      }
+
+      router.replace("/settings");
+      router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "验证失败，请稍后重试。");
     } finally {
       setSubmitting(false);
     }
@@ -97,6 +145,52 @@ export function AuthPanel({
     );
   }
 
+  if (step === "code") {
+    return (
+      <form className="space-y-4" onSubmit={handleVerify}>
+        <div className="rounded-2xl bg-sage-50 p-4">
+          <p className="text-xs font-medium tracking-wide text-sage-400">验证码已发送至</p>
+          <p className="mt-1 break-all font-medium text-sage-800">{inputEmail}</p>
+        </div>
+        <label className="block">
+          <span className="mb-2 block text-sm font-medium text-sage-700">邮箱验证码</span>
+          <input
+            type="text"
+            required
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            value={otp}
+            onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))}
+            placeholder="输入邮件中的数字验证码"
+            className="min-h-[48px] w-full rounded-xl border border-sage-200 bg-white px-4 text-center text-xl font-semibold tracking-[0.28em] text-sage-800 outline-none transition placeholder:text-left placeholder:text-base placeholder:font-normal placeholder:tracking-normal focus:border-sage-500 focus:ring-2 focus:ring-sage-100"
+          />
+        </label>
+        <Button type="submit" className="w-full" disabled={submitting || !otp.trim()}>
+          {submitting ? "正在验证…" : "验证并登录"}
+        </Button>
+        <button
+          type="button"
+          className="w-full rounded-lg py-2 text-sm font-medium text-sage-600 hover:bg-sage-50 focus:outline-none focus:ring-2 focus:ring-sage-300"
+          onClick={() => {
+            setStep("email");
+            setOtp("");
+            setMessage("");
+          }}
+        >
+          更换邮箱或重新发送
+        </button>
+        {message && (
+          <p
+            className={`text-sm leading-6 ${message.startsWith("验证码已发送") ? "text-sage-600" : "text-red-600"}`}
+            role="status"
+          >
+            {message}
+          </p>
+        )}
+      </form>
+    );
+  }
+
   return (
     <form className="space-y-4" onSubmit={handleLogin}>
       <label className="block">
@@ -112,11 +206,11 @@ export function AuthPanel({
         />
       </label>
       <Button type="submit" className="w-full" disabled={submitting}>
-        {submitting ? "正在发送…" : "发送登录链接"}
+        {submitting ? "正在发送…" : "发送邮箱验证码"}
       </Button>
       {message && (
         <p
-          className={`text-sm leading-6 ${message.startsWith("登录链接已发送") ? "text-sage-600" : "text-red-600"}`}
+          className="text-sm leading-6 text-red-600"
           role="status"
         >
           {message}

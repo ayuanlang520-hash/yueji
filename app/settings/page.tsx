@@ -32,7 +32,7 @@ export default async function SettingsPage({
         <p className="mt-2 text-sm leading-6 text-sage-500">
           {email
             ? "你已经登录。后续的书籍、进度和阅读感想会与这个账号同步。"
-            : "无需设置密码。我们会发送一封登录邮件，点击其中的链接即可进入阅迹。"}
+            : "无需设置密码。我们会发送一封验证码邮件，输入其中的数字即可进入阅迹。"}
         </p>
       </div>
 

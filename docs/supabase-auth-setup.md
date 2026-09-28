@@ -1,6 +1,6 @@
 # Supabase 登录配置
 
-当前代码已经接入邮箱 Magic Link 登录，但真实邮件发送需要一个 Supabase 项目。
+当前代码使用邮箱数字验证码登录，真实邮件发送需要一个 Supabase 项目。
 
 ## 1. 准备环境变量
 
@@ -20,25 +20,28 @@
 
 如果使用其他端口测试，也需要加入对应地址。
 
-## 3. 配置 Magic Link 邮件模板
+## 3. 配置邮箱验证码模板
 
-在 Authentication Email Templates 中，对以下两个模板使用同一个登录链接：
+在 Authentication Email Templates 中，对以下两个模板显示 `Token`：
 
 - Confirm signup（首次使用的新邮箱）；
 - Magic Link（已有账号）。
 
 ```html
-<a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
-  进入阅迹
-</a>
+<p>你的阅迹登录验证码是：</p>
+<p style="font-size: 28px; font-weight: 700; letter-spacing: 6px;">
+  {{ .Token }}
+</p>
+<p>验证码短时间内有效。如果不是你本人操作，可以忽略这封邮件。</p>
 ```
 
-这个回调会在服务端验证一次性链接，并把登录会话写入 Cookie。
+不要保留自动登录链接。数字验证码由用户主动输入，不依赖发起登录时的浏览器，也不容易被邮箱的链接预览提前消耗。
 
 ## 4. 手动验收
 
 1. 运行 `npm run dev`。
 2. 打开 `http://localhost:3000/settings`。
-3. 输入邮箱并发送登录链接。
-4. 点击邮件中的链接，应回到“我的”页面并显示当前邮箱。
-5. 点击“退出登录”，页面应恢复为登录表单。
+3. 输入邮箱并发送验证码。
+4. 将邮件中的数字验证码填回页面。
+5. 点击“验证并登录”，页面应显示当前邮箱。
+6. 点击“退出登录”，页面应恢复为登录表单。
