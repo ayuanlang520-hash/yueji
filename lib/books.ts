@@ -32,6 +32,9 @@ function mapBook(row: BookRow): Book {
   };
 }
 
+const bookColumns =
+  "id,title,author,total_pages,current_page,plan_date,status,cover_color,created_at,updated_at";
+
 export async function getBookShelf() {
   if (!isSupabaseConfigured()) {
     return {
@@ -58,9 +61,7 @@ export async function getBookShelf() {
 
   const { data, error } = await supabase
     .from("books")
-    .select(
-      "id,title,author,total_pages,current_page,plan_date,status,cover_color,created_at,updated_at",
-    )
+    .select(bookColumns)
     .order("updated_at", { ascending: false });
 
   return {
@@ -68,5 +69,44 @@ export async function getBookShelf() {
     signedIn: true,
     books: ((data ?? []) as BookRow[]).map(mapBook),
     error: error ? "书架暂时无法读取，请稍后重试。" : null,
+  };
+}
+
+export async function getBookById(bookId: string) {
+  if (!isSupabaseConfigured()) {
+    return {
+      configured: false,
+      signedIn: false,
+      book: null as Book | null,
+      error: "Supabase 尚未连接。",
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      configured: true,
+      signedIn: false,
+      book: null as Book | null,
+      error: null,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("books")
+    .select(bookColumns)
+    .eq("id", bookId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  return {
+    configured: true,
+    signedIn: true,
+    book: data ? mapBook(data as BookRow) : null,
+    error: error ? "这本书暂时无法读取，请稍后重试。" : null,
   };
 }

@@ -62,6 +62,24 @@ export interface Book {
   updatedAt?: string;
 }
 
+export type ReadingSessionStatus = "active" | "completed" | "cancelled";
+
+export interface ReadingSession {
+  id: string;
+  userId: string;
+  bookId: string;
+  status: ReadingSessionStatus;
+  startedAt: string;
+  endedAt?: string;
+  activeSeconds: number;
+  lastResumedAt?: string;
+  progressStart: number;
+  progressEnd?: number;
+  reflectionText?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ===== AI 技巧库 =====
 export type AITipCategory =
   | "提示词技巧"
