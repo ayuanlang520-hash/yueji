@@ -100,6 +100,7 @@ export function ReadingSessionPanel({
   const [clock, setClock] = useState(() => Date.now());
   const [showFinishForm, setShowFinishForm] = useState(false);
   const [finishPage, setFinishPage] = useState(nextPage);
+  const [reflectionText, setReflectionText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(loadError ?? "");
 
@@ -236,6 +237,7 @@ export function ReadingSessionPanel({
         active_seconds: activeSeconds,
         last_resumed_at: null,
         progress_end: finishPage,
+        reflection_text: reflectionText.trim() || null,
       })
       .eq("id", session.id)
       .eq("status", "active");
@@ -257,6 +259,7 @@ export function ReadingSessionPanel({
 
     setSession(null);
     setShowFinishForm(false);
+    setReflectionText("");
     setSubmitting(false);
 
     if (bookError) {
@@ -354,6 +357,18 @@ export function ReadingSessionPanel({
                   本次从第 {session.progressStart} 页开始，全书 {book.totalPages} 页。
                 </span>
               </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-sage-700">
+                  这次阅读让我产生了什么想法或疑问？
+                </span>
+                <textarea
+                  rows={4}
+                  value={reflectionText}
+                  onChange={(event) => setReflectionText(event.target.value)}
+                  placeholder="可以留空，也可以写下一点此刻的想法。"
+                  className="w-full resize-y rounded-xl border border-sage-200 bg-white px-3 py-3 text-base leading-6 text-sage-800 outline-none transition placeholder:text-sage-300 focus:border-sage-500 focus:ring-2 focus:ring-sage-100"
+                />
+              </label>
               <div className="flex flex-wrap gap-3">
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "正在保存…" : "保存这次阅读"}
@@ -402,6 +417,11 @@ export function ReadingSessionPanel({
                     第 {item.progressStart} 页 → 第 {item.progressEnd} 页
                   </p>
                   <p className="mt-1 text-xs text-sage-400">{formatSessionDate(item.startedAt)}</p>
+                  {item.reflectionText && (
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-sage-600">
+                      “{item.reflectionText}”
+                    </p>
+                  )}
                 </div>
                 <p className="shrink-0 text-sm font-semibold tabular-nums text-sage-600">
                   {formatDuration(item.activeSeconds)}
