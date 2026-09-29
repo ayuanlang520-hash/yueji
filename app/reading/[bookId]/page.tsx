@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookIcon } from "@/components/icons";
+import { ReadingSessionPanel } from "@/components/reading/ReadingSessionPanel";
 import { Card } from "@/components/ui/Card";
 import { getBookById } from "@/lib/books";
+import { getReadingSessions } from "@/lib/readingSessions";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +65,7 @@ export default async function BookDetailPage({
   if (!result.book) notFound();
 
   const book = result.book;
+  const readingSessions = await getReadingSessions(book.id);
   const percent = Math.min(
     100,
     Math.max(0, Math.round((book.currentPage / book.totalPages) * 100)),
@@ -123,35 +126,12 @@ export default async function BookDetailPage({
         </div>
       </section>
 
-      <Card className="border border-sage-100 p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-sage-800">
-              {book.status === "done" ? "这本书已经读完" : "从上次的位置继续"}
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-sage-500">
-              {book.status === "done"
-                ? "阅读记录会在下一阶段出现在这里。"
-                : `下一次将从第 ${Math.min(book.currentPage + 1, book.totalPages)} 页开始。`}
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled
-            className="min-h-[46px] shrink-0 cursor-not-allowed rounded-xl bg-sage-100 px-5 text-sm font-medium text-sage-500"
-          >
-            继续阅读
-          </button>
-        </div>
-        <p className="mt-3 text-xs text-sage-400">阅读计时尚未接入，将在下一阶段开放。</p>
-      </Card>
-
-      <Card className="border border-dashed border-sage-200 bg-sage-50/60 shadow-none">
-        <p className="text-sm font-medium text-sage-700">阅读记录</p>
-        <p className="mt-1 text-sm leading-6 text-sage-500">
-          计时功能接入后，每次阅读会按时间顺序出现在这里。
-        </p>
-      </Card>
+      <ReadingSessionPanel
+        book={book}
+        initialActiveSession={readingSessions.activeSession}
+        sessions={readingSessions.sessions}
+        loadError={readingSessions.error}
+      />
     </div>
   );
 }
