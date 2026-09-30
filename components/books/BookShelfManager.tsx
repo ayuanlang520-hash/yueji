@@ -107,6 +107,7 @@ export function BookShelfManager({ books }: { books: Book[] }) {
 
   const reading = books.filter((book) => book.status === "reading");
   const finished = books.filter((book) => book.status === "done");
+  const stopped = books.filter((book) => book.status === "stopped");
 
   return (
     <div className="space-y-8">
@@ -228,6 +229,18 @@ export function BookShelfManager({ books }: { books: Book[] }) {
           </div>
           <div className="space-y-3">
             {finished.map((book) => <BookCard key={book.id} book={book} />)}
+          </div>
+        </section>
+      )}
+
+      {stopped.length > 0 && (
+        <section>
+          <div className="mb-3 px-1">
+            <p className="text-xs text-sage-400">停止阅读 · {stopped.length} 本</p>
+            <h2 className="mt-0.5 text-lg font-semibold text-sage-800">停在这里，也是一段真实轨迹</h2>
+          </div>
+          <div className="space-y-3">
+            {stopped.map((book) => <BookCard key={book.id} book={book} />)}
           </div>
         </section>
       )}

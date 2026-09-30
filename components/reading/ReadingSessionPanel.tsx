@@ -99,8 +99,10 @@ export function ReadingSessionPanel({
   const [session, setSession] = useState(initialActiveSession);
   const [clock, setClock] = useState(() => Date.now());
   const [showFinishForm, setShowFinishForm] = useState(false);
+  const [showStopForm, setShowStopForm] = useState(false);
   const [finishPage, setFinishPage] = useState(nextPage);
   const [reflectionText, setReflectionText] = useState("");
+  const [stopReason, setStopReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(loadError ?? "");
 
@@ -270,6 +272,41 @@ export function ReadingSessionPanel({
     router.refresh();
   }
 
+  async function stopReading(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const reason = stopReason.trim();
+
+    if (!reason) {
+      setMessage("请写下为什么决定停在这里。");
+      return;
+    }
+
+    setSubmitting(true);
+    setMessage("");
+
+    const now = new Date().toISOString();
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("books")
+      .update({
+        status: "stopped",
+        stopped_at: now,
+        stop_reason: reason,
+        updated_at: now,
+      })
+      .eq("id", book.id)
+      .eq("status", "reading");
+
+    if (error) {
+      setMessage("暂时无法保存停止原因，请稍后重试。");
+    } else {
+      setShowStopForm(false);
+      setMessage("已保存。停在这里，不代表这段阅读没有价值。");
+      router.refresh();
+    }
+    setSubmitting(false);
+  }
+
   if (session && !isThisBook) {
     return (
       <Card className="border border-sage-100 p-5">
@@ -308,18 +345,61 @@ export function ReadingSessionPanel({
         </div>
 
         <div className="p-5 sm:p-6">
-          {!session && book.status !== "done" && (
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {!session && book.status === "reading" && !showStopForm && (
+            <div className="space-y-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-sage-800">从第 {nextPage} 页继续</h2>
+                  <p className="mt-1 text-sm leading-6 text-sage-500">
+                    开始后可以随时暂停，暂停的时间不会被计算。
+                  </p>
+                </div>
+                <Button className="shrink-0" onClick={() => void startSession()} disabled={submitting}>
+                  {submitting ? "正在开始…" : "开始阅读"}
+                </Button>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-sage-400 underline-offset-4 hover:text-sage-600 hover:underline focus:outline-none focus:ring-2 focus:ring-sage-300"
+                onClick={() => {
+                  setMessage("");
+                  setShowStopForm(true);
+                }}
+              >
+                我不想继续读了
+              </button>
+            </div>
+          )}
+
+          {!session && book.status === "reading" && showStopForm && (
+            <form className="space-y-4" onSubmit={stopReading}>
               <div>
-                <h2 className="text-lg font-semibold text-sage-800">从第 {nextPage} 页继续</h2>
+                <h2 className="text-lg font-semibold text-sage-800">为什么决定停在这里？</h2>
                 <p className="mt-1 text-sm leading-6 text-sage-500">
-                  开始后可以随时暂停，暂停的时间不会被计算。
+                  已读进度、阅读时间和感想都会保留。弃读不是失败。
                 </p>
               </div>
-              <Button className="shrink-0" onClick={() => void startSession()} disabled={submitting}>
-                {submitting ? "正在开始…" : "开始阅读"}
-              </Button>
-            </div>
+              <label className="block">
+                <span className="sr-only">停止阅读的原因</span>
+                <textarea
+                  required
+                  autoFocus
+                  rows={4}
+                  value={stopReason}
+                  onChange={(event) => setStopReason(event.target.value)}
+                  placeholder="例如：现在不是适合读它的时候。"
+                  className="w-full resize-y rounded-xl border border-sage-200 bg-white px-3 py-3 text-base leading-6 text-sage-800 outline-none transition placeholder:text-sage-300 focus:border-sage-500 focus:ring-2 focus:ring-sage-100"
+                />
+              </label>
+              <div className="flex flex-wrap gap-3">
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? "正在保存…" : "保存并停止阅读"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => setShowStopForm(false)}>
+                  继续保留在读
+                </Button>
+              </div>
+            </form>
           )}
 
           {session && !showFinishForm && (
@@ -384,6 +464,19 @@ export function ReadingSessionPanel({
             <div>
               <h2 className="text-lg font-semibold text-sage-800">这本书已经读完</h2>
               <p className="mt-1 text-sm leading-6 text-sage-500">下面保留了你真实的阅读记录。</p>
+            </div>
+          )}
+
+          {book.status === "stopped" && !session && (
+            <div>
+              <h2 className="text-lg font-semibold text-sage-800">这本书停在第 {book.currentPage} 页</h2>
+              <p className="mt-1 text-sm leading-6 text-sage-500">已读进度和原有阅读记录都保留在这里。</p>
+              {book.stopReason && (
+                <div className="mt-4 rounded-2xl bg-sage-50 px-4 py-3">
+                  <p className="text-xs font-medium text-sage-400">停在这里的原因</p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-sage-700">{book.stopReason}</p>
+                </div>
+              )}
             </div>
           )}
 

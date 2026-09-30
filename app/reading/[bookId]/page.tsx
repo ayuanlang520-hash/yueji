@@ -93,7 +93,11 @@ export default async function BookDetailPage({
             />
             <div className="relative flex h-full min-h-52 flex-col justify-between border-l border-white/25 pl-4 sm:min-h-[19rem]">
               <p className="text-xs font-medium tracking-[0.18em] text-white/70">
-                {book.status === "done" ? "已经读完" : "正在阅读"}
+                {book.status === "done"
+                  ? "已经读完"
+                  : book.status === "stopped"
+                    ? "停在这里"
+                    : "正在阅读"}
               </p>
               <div>
                 <h1 className="font-serif text-3xl font-semibold leading-tight">{book.title}</h1>

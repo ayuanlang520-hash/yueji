@@ -56,8 +56,10 @@ export interface Book {
   totalPages: number;
   currentPage: number;
   planDate?: string; // 计划完成日期
-  status: "reading" | "done";
+  status: "reading" | "done" | "stopped";
   coverColor: string;
+  stoppedAt?: string;
+  stopReason?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -11,8 +11,10 @@ type BookRow = {
   total_pages: number;
   current_page: number;
   plan_date: string | null;
-  status: "reading" | "done";
+  status: "reading" | "done" | "stopped";
   cover_color: string;
+  stopped_at: string | null;
+  stop_reason: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -27,13 +29,15 @@ function mapBook(row: BookRow): Book {
     planDate: row.plan_date ?? undefined,
     status: row.status,
     coverColor: row.cover_color,
+    stoppedAt: row.stopped_at ?? undefined,
+    stopReason: row.stop_reason ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
 const bookColumns =
-  "id,title,author,total_pages,current_page,plan_date,status,cover_color,created_at,updated_at";
+  "id,title,author,total_pages,current_page,plan_date,status,cover_color,stopped_at,stop_reason,created_at,updated_at";
 
 export async function getBookShelf() {
   if (!isSupabaseConfigured()) {

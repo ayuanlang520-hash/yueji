@@ -43,7 +43,9 @@ export function BookCard({ book }: { book: Book }) {
           <p className="mt-2 text-xs text-sage-400">
             {book.status === "done"
               ? `已读完 · 共 ${book.totalPages} 页`
-              : `还剩 ${Math.max(0, book.totalPages - book.currentPage)} 页`}
+              : book.status === "stopped"
+                ? `停在第 ${book.currentPage} 页`
+                : `还剩 ${Math.max(0, book.totalPages - book.currentPage)} 页`}
           </p>
         </div>
       </Card>
